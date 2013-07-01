@@ -57,7 +57,7 @@ object SprayAspectBuild extends Build {
         },*/
 
         // configure our aspects
-        binaries in Aspectj <<= (packageBin in Compile in sprayAspects) map (Seq(_)),
+        binaries in Aspectj <<= products in Compile in sprayAspects,
         // reconfigure our products to use the output of aspectj
         products in Compile <<= products in Aspectj,
 
