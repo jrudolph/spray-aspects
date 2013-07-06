@@ -2,7 +2,7 @@ package spray.examples
 
 import scala.util.{Success, Failure}
 import scala.concurrent.duration._
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, IOLogHandler, ActorSystem}
 import akka.pattern.ask
 import akka.event.Logging
 import akka.io.IO
@@ -11,6 +11,7 @@ import spray.can.Http
 import spray.httpx.SprayJsonSupport
 import spray.client.pipelining._
 import spray.util._
+import java.nio.channels.SocketChannel
 
 case class Elevation(location: Location, elevation: Double)
 case class Location(lat: Double, lng: Double)
@@ -27,6 +28,12 @@ object Main extends App {
   implicit val system = ActorSystem("simple-spray-client")
   import system.dispatcher // execution context for futures below
   val log = Logging(system, getClass)
+
+  akka.io.IOLogHandler.setHandler(new akka.io.IOLogHandler {
+    def handleChannelReadable(connection: ActorRef, channel: SocketChannel) {
+      println("Now readable")
+    }
+  })
 
   log.info("Requesting the elevation of Mt. Everest from Googles Elevation API...")
 
@@ -48,7 +55,7 @@ object Main extends App {
   }
 
   def shutdown(): Unit = {
-    IO(Http).ask(Http.CloseAll)(1.second).await
+    IO(Http).ask(Http.CloseAll)(5.second).await
     system.shutdown()
   }
 }
