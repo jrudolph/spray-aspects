@@ -47,7 +47,7 @@ object SprayAspectBuild extends Build {
         // inputs in Aspectj <+= compiledClasses,
 
         inputs in Aspectj <++= (externalDependencyClasspath in Compile).map { cp =>
-          val whitelist = Seq("spray-io", "scala-reflect")
+          val whitelist = Seq("spray-io", "spray-can", "scala-reflect")
           cp.map(_.data).filter(f => whitelist.exists(f.getName.contains))
         },
 
